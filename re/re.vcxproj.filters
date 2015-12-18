@@ -32,17 +32,20 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\dfa.h">
+    <ClInclude Include="include\dfa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\label.h">
+    <ClInclude Include="include\label.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\nfa.h">
+    <ClInclude Include="include\nfa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\set.h">
+    <ClInclude Include="include\set.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Doxyfile.txt" />
   </ItemGroup>
 </Project>

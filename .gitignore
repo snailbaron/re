@@ -1,5 +1,5 @@
-Debug/
-Release/
-.vs/
+docs/
+x64/
 *.sdf
 *.user
+*.suo

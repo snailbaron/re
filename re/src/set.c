@@ -1,8 +1,16 @@
+/**
+ * @file
+ * @brief Brief for set.c
+*/
+
 #include "set.h"
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 
+/**
+ * \brief Unordered set of arbitrary elements
+*/
 struct set_t
 {
     void *data;
@@ -11,18 +19,22 @@ struct set_t
     size_t size;
 };
 
-void * _addr(set_t *set, size_t idx)
+static void * _addr(set_t *set, size_t idx)
 {
     return (char *)set->data + set->elsize * idx;
 }
 
-void _extend(set_t *set)
+static void _extend(set_t *set)
 {
     set->cap = set->cap * 2;
     set->data = realloc(set->data, set->elsize * set->cap);
 }
 
-set_t * set_create(size_t element_size)
+/**
+ * Create a set of elements, having \p element_size size.
+ * @param element_size Size of element
+*/
+set_t * set_create_by_size(size_t element_size)
 {
     set_t *set = malloc(sizeof(set_t));
     set->data = malloc(element_size);
@@ -32,6 +44,9 @@ set_t * set_create(size_t element_size)
     return set;
 }
 
+/**
+ * Free resources, used by the set.
+ */
 void set_kill(set_t *set)
 {
     assert(set && set->data);
@@ -39,11 +54,17 @@ void set_kill(set_t *set)
     free(set);
 }
 
+/**
+ * Get number of elements in the set
+ */
 size_t set_size(set_t *set)
 {
     return set->size;
 }
 
+/**
+ * Add an element to the set
+ */
 void set_add(set_t *set, void *data)
 {
     if (set->size == set->cap) {
@@ -75,6 +96,9 @@ set_iter_t set_next(set_t *set, set_iter_t iter)
     return next;
 }
 
+/**
+ * Get element of set
+ */
 void set_get(set_t *set, set_iter_t iter, void *dst)
 {
     if (!set_end(set, iter)) {
@@ -82,6 +106,9 @@ void set_get(set_t *set, set_iter_t iter, void *dst)
     }
 }
 
+/**
+ * Get pointer to element
+ */
 void * set_pget(set_t *set, set_iter_t iter)
 {
     if (set_end(set, iter)) {
@@ -90,6 +117,9 @@ void * set_pget(set_t *set, set_iter_t iter)
     return _addr(set, iter.idx);
 }
 
+/**
+ * Remove element from set
+ */
 void set_rm(set_t *set, set_iter_t iter)
 {
     assert(!set_end(set, iter));
@@ -100,3 +130,10 @@ void set_rm(set_t *set, set_iter_t iter)
     set->size--;
 }
 
+/**
+ * Remove all emements from \p set
+ */
+void set_clear(set_t *set)
+{
+    set->size = 0;
+}

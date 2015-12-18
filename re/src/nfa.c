@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "set.h"
 
 #define MAX_RULES 2
 #define MAX_SYMS 100
@@ -72,12 +73,46 @@ void nfa_link(nfa_state_t *start, nfa_state_t *end, sym_t sym)
 
 nfa_run_result_t nfa_run(nfa_t *nfa, sym_t *input, size_t input_len)
 {
-    nfa_state_t *current[MAX_PARALLEL_STATES];
-    size_t state_count = 0;
+    set_t *cur = set_create(nfa_state_t *);
+    set_add(cur, nfa->start);
 
-    state_count = 1;
-    current[0] = nfa->start;
+    set_t *next = set_create(nfa_state_t *);
 
-    
-    return NFA_ERROR; 
+    // Read input one character at a time
+    for (size_t i = 0; i < input_len; i++) {
+        set_clear(next);
+
+        // Move each of the current states
+        for (set_iter_t it = set_begin(cur); set_size(cur) > 0; set_rm(cur, it)) {
+            nfa_state_t *ps = set_pget(cur, it);
+            
+            // Move the state using all applicable rules
+            for (size_t j = 0; j < ps->rule_count; j++) {
+                if (ps->outs[j][sym_index(input[i])] != NULL) {
+                    set_add(next, ps->outs[j][sym_index(input[i])]);
+                }
+            }
+        }
+
+        set_kill(cur);
+        cur = next;
+        next = set_create(nfa_state_t);
+    }
+    set_kill(next);
+
+    bool yes = false;
+    for (set_iter_t it = set_begin(cur); !set_end(cur, it); it = set_next(cur, it)) {
+        nfa_state_t *ps = set_pget(cur, it);
+        if (ps->finish) {
+            yes = true;
+            break;
+        }
+    }
+    set_kill(cur);
+
+    if (yes) {
+        return NFA_YES;
+    } else {
+        return NFA_NO;
+    }
 }
