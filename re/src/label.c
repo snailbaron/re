@@ -61,7 +61,7 @@ void label_append_str_with_len(label_t *label, const char *str, size_t str_len)
     label_extend(label, len_sum);
     //strcpy_s(label->data + label->size, label->buf_len - label->size, str);
     char *dst = label->data + label->size;
-    char *src = str;
+    const char *src = str;
     while (*dst++ = *src++);
     label->size = len_sum;
 }
