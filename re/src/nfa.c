@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "set.h"
+#include "stack.h"
 
 #define MAX_RULES 2
 #define MAX_SYMS 100
@@ -115,4 +116,25 @@ nfa_run_result_t nfa_run(nfa_t *nfa, sym_t *input, size_t input_len)
     } else {
         return NFA_NO;
     }
+}
+
+void nfa_gen_dot(nfa_t *nfa, const char *fname)
+{
+    FILE *of = NULL;
+    if (fopen_s(&of, fname, "w")) {
+        return;
+    }
+
+    fprintf(of, "digraph {\n");
+    fprintf(of, "    rankdir = LR\n");
+    fprintf(of, "    node [shape=circle]\n");
+    fprintf(of, "\n");
+
+            
+
+
+    fprintf(of, "}\n");
+
+
+    fclose(of);
 }
