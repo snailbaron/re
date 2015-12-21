@@ -36,6 +36,12 @@
     <ClCompile Include="src\map.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\oset.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\dfa.h">
@@ -56,7 +62,7 @@
     <ClInclude Include="include\map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\sset.h">
+    <ClInclude Include="include\list.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

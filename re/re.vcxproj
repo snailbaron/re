@@ -184,8 +184,10 @@
   <ItemGroup>
     <ClCompile Include="src\dfa.c" />
     <ClCompile Include="src\label.c" />
+    <ClCompile Include="src\list.c" />
     <ClCompile Include="src\main.c" />
     <ClCompile Include="src\nfa.c" />
+    <ClCompile Include="src\oset.c" />
     <ClCompile Include="src\set.c" />
     <ClCompile Include="src\map.c" />
     <ClCompile Include="src\stack.c" />
@@ -193,10 +195,10 @@
   <ItemGroup>
     <ClInclude Include="include\dfa.h" />
     <ClInclude Include="include\label.h" />
+    <ClInclude Include="include\list.h" />
     <ClInclude Include="include\nfa.h" />
     <ClInclude Include="include\set.h" />
     <ClInclude Include="include\map.h" />
-    <ClInclude Include="include\sset.h" />
     <ClInclude Include="include\stack.h" />
   </ItemGroup>
   <ItemGroup>

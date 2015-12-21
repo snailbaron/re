@@ -1,35 +1,30 @@
 #include <set.h>
 #include <stdio.h>
 
-struct data
-{
-    int number;
-    char str[10];
-};
-
-void print_data(struct data *d)
-{
-    printf("Data: %d | %s\n", d->number, d->str);
-}
+#include <list.h>
 
 int main()
 {
-    struct data d1 = { 10, "hi" };
-    struct data d2 = { -5, "Hello" };
+    list_t *list = list_create(int);
 
-
-    set_t *set = set_create(struct data);
-
-    printf("Size: %lld\n", set_size(set));
-    set_add(set, &d1);
-    printf("Size: %lld\n", set_size(set));
-    set_add(set, &d2);
-    printf("Size: %lld\n", set_size(set));
-
-    for (set_iter_t it = set_begin(set); !set_end(set, it); it = set_next(set, it)) {
-        struct data d;
-        set_get(set, it, &d);
-        print_data(&d);
+    list_iter_t *it = list_start_iter(list);
+    for (int i = 0; i < 10; i++) {
+        list_add(it, &i);
+        list_next(it);
     }
+    list_end_iter(it);
 
+
+    for (list_iter_t *it = list_start_iter(list); !list_end(it); list_next(it)) {
+        int value;
+        list_get(it, &value);
+        printf("Value: %d\n", value);
+    }
+    list_end_iter(it);
+    
+        
+
+        
+
+    
 }

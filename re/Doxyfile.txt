@@ -5,10 +5,9 @@ PROJECT_NUMBER         = 1.0
 DOXYFILE_ENCODING      = UTF-8
 OPTIMIZE_OUTPUT_FOR_C  = YES
 TYPEDEF_HIDES_STRUCT   = NO
-INPUT                  = include src
+INPUT                  = include
 INPUT_ENCODING         = UTF-8
-FILE_PATTERNS          = *.h *.c
-#FILE_PATTERNS          = *.h
+FILE_PATTERNS          = *.h
 RECURSIVE              = YES
 
 
