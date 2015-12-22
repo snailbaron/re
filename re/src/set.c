@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-
 #define HASH_VALUE_COUNT 256
 #define HASH_VALUE_MAX 255
 

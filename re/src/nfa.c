@@ -1,58 +1,40 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-//#include "nfa.h"
+#include "nfa.h"
+#include "set.h"
 
 typedef unsigned int nfa_state_t;
 typedef char sym_t;
 typedef struct nfa_trans_t nfa_trans_t;
-typedef struct list_item_t list_item_t;
-typedef struct nfa_fin_state_t nfa_fin_state_t;
-typedef struct nfa_lst_t nfa_lst_t;
-typedef struct nfa_t nfa_t;
-
-struct list_item_t
-{
-    list_item_t *next;
-};
 
 struct nfa_trans_t
 {
     nfa_state_t start;
     sym_t sym;
     nfa_state_t end;
-    list_item_t list;
-};
-
-struct nfa_fin_state_t
-{
-    nfa_state_t state;
-    list_item_t list;
 };
 
 struct nfa_t
 {
-    nfa_state_t state_count;
-    nfa_state_t start;
-    list_item_t trans_table;
-    list_item_t fin_states;
-};
-
-struct nfa_lst_t
-{
-    nfa_state_t state;
-    list_item_t list;
+    nfa_state_t start_state;
+    set_t *fin_states;
+    set_t *trans_table;
 };
 
 nfa_t * nfa_create()
 {
     nfa_t *nfa = malloc(sizeof(nfa_t));
-    nfa->state_count = 0;
-    nfa->start = 0;
-    nfa->trans_table.next = NULL;
-    nfa->fin_states.next = NULL;
+    nfa->start_state = 0;
+    nfa->fin_states = set_create(nfa_state_t);
+    nfa->trans_table = set_create(nfa_trans_t);
     return nfa;
 }
+
+
+
+
+
 
 nfa_state_t nfa_add_state(nfa_t *nfa, const char *name)
 {

@@ -183,6 +183,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\dfa.c" />
+    <ClCompile Include="src\htable.c" />
     <ClCompile Include="src\label.c" />
     <ClCompile Include="src\list.c" />
     <ClCompile Include="src\main.c" />
