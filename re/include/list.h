@@ -65,6 +65,8 @@
 #ifndef _LIST_H_
 #define _LIST_H_
 
+#include <stdbool.h>
+
 /**
  * @brief The list structure
  *
@@ -72,6 +74,10 @@
  * You can use it to iterate over the list, and remove it.
  */
 typedef struct list_t list_t;
+
+
+
+typedef struct node_t node_t;
 
 /**
  * @brief Create list by element size
@@ -99,12 +105,35 @@ list_t * list_create_by_size(size_t element_size);
 void list_kill(list_t *list);
 
 /**
+ * @brief Insert a value at the beginning of list
+ */
+void list_prepend(list_t *list, void *value);
+
+/**
+ * @brief Insert a value at the end of list
+ */
+void list_append(list_t *list, void *value);
+
+
+
+
+bool list_empty(list_t *list);
+
+
+/**
  * @brief Iterator over the list
  *
  * An opaque structure holding an iterator for a list. You can use it when iterating
  * over the list to insert, remove, or get values of list elements.
  */
 typedef struct list_iter_t list_iter_t;
+
+struct list_iter_t
+{
+    list_t *list;
+    node_t *ptr;
+    node_t **ref_ptr;
+};
 
 /**
  * @brief Begin iterating a list
@@ -115,14 +144,7 @@ typedef struct list_iter_t list_iter_t;
  * The current value of the returned iterator is set to list's HEAD node, or NULL.
  * The parent reference is the list's HEAD pointer.
  */
-list_iter_t * list_start_iter(list_t *list);
-
-/**
- * @brief Finish iterating a list
- *
- * @param[in] it Iterator to kill
- */
-void list_end_iter(list_iter_t *it);
+list_iter_t list_first(list_t *list);
 
 /**
  * @brief Get next list element
@@ -139,7 +161,7 @@ void list_next(list_iter_t *it);
  *
  * @param[in] it Iterator to check
  */
-bool list_end(list_iter_t *it);
+bool list_done(list_iter_t *it);
 
 /**
  * @brief Get pointer to current list elment
@@ -166,7 +188,7 @@ void list_get(list_iter_t *it, void *dst);
  * the iterator is pointing to the inserted node, and its parent reference is
  * untouched.
  */
-void list_add(list_iter_t *it, void *value);
+void list_insert(list_iter_t *it, void *value);
 
 /**
  * @brief Remove an element from the list
@@ -178,5 +200,8 @@ void list_add(list_iter_t *it, void *value);
  * reference is untouched.
  */
 void list_rm(list_iter_t *it);
+
+
+list_iter_t list_find(list_t *list, void *value);
 
 #endif

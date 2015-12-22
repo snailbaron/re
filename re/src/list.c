@@ -5,8 +5,6 @@
 
 #include "list.h"
 
-typedef struct node_t node_t;
-
 /**
  * Node of a list
  */
@@ -57,34 +55,43 @@ void list_kill(list_t *list)
     free(list);
 }
 
-struct list_iter_t
+void list_prepend(list_t *list, void *value)
 {
-    list_t *list;
-    node_t *ptr;
-    node_t **ref_ptr;
-};
-
-list_iter_t * list_start_iter(list_t *list)
-{
-    list_iter_t *it = malloc(sizeof(list_iter_t));
-    it->list = list;
-    it->ptr = list->head;
-    it->ref_ptr = &list->head;
-    return it;
+    node_t *node = _create_node(list, value, list->head);
+    list->head = node;
 }
 
-void list_end_iter(list_iter_t *it)
+void list_append(list_t *list, void *value)
 {
-    free(it);
+    node_t *node = _create_node(list, value, NULL);
+    node_t **p = &list->head;
+    while (*p != NULL) {
+        *p = (*p)->next;
+    }
+    *p = node;
+}
+
+bool list_empty(list_t *list)
+{
+    return (list->head == NULL);
+}
+
+list_iter_t list_first(list_t *list)
+{
+    list_iter_t it;
+    it.list = list;
+    it.ptr = list->head;
+    it.ref_ptr = &list->head;
+    return it;
 }
 
 void list_next(list_iter_t *it)
 {
-    *it->ref_ptr = it->ptr;
+    it->ref_ptr = &it->ptr->next;
     it->ptr = it->ptr->next;
 }
 
-bool list_end(list_iter_t *it)
+bool list_done(list_iter_t *it)
 {
     return (it->ptr == NULL);
 }
@@ -99,7 +106,7 @@ void list_get(list_iter_t *it, void *dst)
     memcpy(dst, list_pget(it), it->list->elsize);
 }
 
-void list_add(list_iter_t *it, void *value)
+void list_insert(list_iter_t *it, void *value)
 {
     node_t *node = _create_node(it->list, value, it->ptr);
     *it->ref_ptr = node;
@@ -108,8 +115,22 @@ void list_add(list_iter_t *it, void *value)
 
 void list_rm(list_iter_t *it)
 {
-    assert(it->ptr);
     *it->ref_ptr = it->ptr->next;
     free(it->ptr);
-    it->ptr = it->ptr->next;
+    it->ptr = *it->ref_ptr;
+}
+
+list_iter_t list_find(list_t *list, void *value)
+{
+    list_iter_t it = list_first(list);
+    void *val = malloc(list->elsize);
+    for ( ; !list_done(&it); list_next(&it)) {
+        list_get(&it, val);
+        if (strncmp(val, value, list->elsize) == 0) {
+            break;
+        }
+    }
+    free(val);
+
+    return it;        
 }
