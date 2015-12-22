@@ -13,7 +13,7 @@ struct map_t
     int (*compare)(void *left, void *right);
 };
 
-static struct node_t
+struct node_t
 {
     void *key;
     void *value;
