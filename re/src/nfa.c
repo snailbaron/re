@@ -1,140 +1,93 @@
-#include "nfa.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "set.h"
-#include "stack.h"
+//#include "nfa.h"
 
-#define MAX_RULES 2
-#define MAX_SYMS 100
-#define MAX_NAME_LEN 100
-#define MAX_PARALLEL_STATES 100
+typedef unsigned int nfa_state_t;
+typedef char sym_t;
+typedef struct nfa_trans_t nfa_trans_t;
+typedef struct list_item_t list_item_t;
+typedef struct nfa_fin_state_t nfa_fin_state_t;
+typedef struct nfa_lst_t nfa_lst_t;
+typedef struct nfa_t nfa_t;
 
-size_t sym_index(sym_t sym)
+struct list_item_t
 {
-    return sym - 'a' + 1;
-}
+    list_item_t *next;
+};
+
+struct nfa_trans_t
+{
+    nfa_state_t start;
+    sym_t sym;
+    nfa_state_t end;
+    list_item_t list;
+};
+
+struct nfa_fin_state_t
+{
+    nfa_state_t state;
+    list_item_t list;
+};
 
 struct nfa_t
 {
-    nfa_state_t *start;
+    nfa_state_t state_count;
+    nfa_state_t start;
+    list_item_t trans_table;
+    list_item_t fin_states;
 };
 
-struct nfa_state_t
+struct nfa_lst_t
 {
-    bool finish;
-    char name[MAX_NAME_LEN + 1];
-    nfa_state_t *outs[MAX_RULES][MAX_SYMS];
-    size_t rule_count;
+    nfa_state_t state;
+    list_item_t list;
 };
 
 nfa_t * nfa_create()
 {
     nfa_t *nfa = malloc(sizeof(nfa_t));
-    nfa->start = NULL;
+    nfa->state_count = 0;
+    nfa->start = 0;
+    nfa->trans_table.next = NULL;
+    nfa->fin_states.next = NULL;
     return nfa;
 }
 
-nfa_state_t * nfa_create_state(const char *name)
+nfa_state_t nfa_add_state(nfa_t *nfa, const char *name)
 {
-    nfa_state_t *state = malloc(sizeof(nfa_state_t));
-    state->finish = false;
-    strncpy_s(state->name, MAX_NAME_LEN + 1, name, MAX_NAME_LEN);
-    for (size_t i = 0; i < MAX_RULES; i++) {
-        for (size_t j = 0; j < MAX_SYMS; j++) {
-            state->outs[i][j] = NULL;
-        }
-    }
-    state->rule_count = 0;
-    
-    return state;
+    nfa->state_count++;
+    return nfa->state_count;
 }
 
-void nfa_set_start(nfa_t *nfa, nfa_state_t *state)
+void nfa_set_start(nfa_t *nfa, nfa_state_t state)
 {
     nfa->start = state;
 }
 
-nfa_state_t * nfa_create_start_state(nfa_t *nfa, const char *name)
+void nfa_set_finish(nfa_t *nfa, nfa_state_t state)
 {
-    nfa_state_t *state = nfa_create_state(name);
-    nfa_set_start(nfa, state);
-    return state;
-}
-
-void nfa_set_finish(nfa_state_t *state, bool finish)
-{
-    state->finish = finish;
-}
-
-void nfa_link(nfa_state_t *start, nfa_state_t *end, sym_t sym)
-{
-    start->outs[start->rule_count++][sym] = end;
-}
-
-nfa_run_result_t nfa_run(nfa_t *nfa, sym_t *input, size_t input_len)
-{
-    set_t *cur = set_create(nfa_state_t *);
-    set_add(cur, nfa->start);
-
-    set_t *next = set_create(nfa_state_t *);
-
-    // Read input one character at a time
-    for (size_t i = 0; i < input_len; i++) {
-        set_clear(next);
-
-        // Move each of the current states
-        for (set_iter_t it = set_begin(cur); set_size(cur) > 0; set_rm(cur, it)) {
-            nfa_state_t *ps = set_pget(cur, it);
-            
-            // Move the state using all applicable rules
-            for (size_t j = 0; j < ps->rule_count; j++) {
-                if (ps->outs[j][sym_index(input[i])] != NULL) {
-                    set_add(next, ps->outs[j][sym_index(input[i])]);
-                }
-            }
-        }
-
-        set_kill(cur);
-        cur = next;
-        next = set_create(nfa_state_t);
+    list_item_t *p = &nfa->fin_states;
+    while (p->next != NULL) {
+        p = p->next;
     }
-    set_kill(next);
-
-    bool yes = false;
-    for (set_iter_t it = set_begin(cur); !set_end(cur, it); it = set_next(cur, it)) {
-        nfa_state_t *ps = set_pget(cur, it);
-        if (ps->finish) {
-            yes = true;
-            break;
-        }
-    }
-    set_kill(cur);
-
-    if (yes) {
-        return NFA_YES;
-    } else {
-        return NFA_NO;
-    }
+    nfa_fin_state_t *fin = malloc(sizeof(nfa_fin_state_t));
+    fin->list.next = NULL;
+    fin->state = state;
+    p->next = &fin->list;
 }
 
-void nfa_gen_dot(nfa_t *nfa, const char *fname)
+void nfa_link(nfa_t *nfa, nfa_state_t start, nfa_state_t end, sym_t sym)
 {
-    FILE *of = NULL;
-    if (fopen_s(&of, fname, "w")) {
-        return;
+    list_item_t *p = &nfa->trans_table;
+    while (p->next != NULL) {
+        p = p->next;
     }
-
-    fprintf(of, "digraph {\n");
-    fprintf(of, "    rankdir = LR\n");
-    fprintf(of, "    node [shape=circle]\n");
-    fprintf(of, "\n");
-
-            
-
-
-    fprintf(of, "}\n");
-
-
-    fclose(of);
+    nfa_trans_t *trans = malloc(sizeof(nfa_trans_t));
+    trans->start = start;
+    trans->end = end;
+    trans->sym = sym;
+    trans->list.next = NULL;
+    p->next = &trans->list;
 }
+
