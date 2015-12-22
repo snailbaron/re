@@ -1,139 +1,113 @@
-/**
- * @file
- * @brief Brief for set.c
-*/
-
 #include "set.h"
-#include <stdlib.h>
+#include "list.h"
+#include <stdint.h>
 #include <string.h>
-#include <assert.h>
+#include <stdlib.h>
 
-/**
- * \brief Unordered set of arbitrary elements
-*/
+
+#define HASH_VALUE_COUNT 256
+#define HASH_VALUE_MAX 255
+
 struct set_t
 {
-    void *data;
+    list_t *table[HASH_VALUE_COUNT];
     size_t elsize;
-    size_t cap;
-    size_t size;
 };
 
-static void * _addr(set_t *set, size_t idx)
+hash_t _hash(set_t *set, void *value)
 {
-    return (char *)set->data + set->elsize * idx;
+    char *bytes = value;
+    hash_t hash = 0;
+    for (size_t i = 0; i < set->elsize; i++) {
+        hash += bytes[i];
+    }
+    return hash;
 }
 
-static void _extend(set_t *set)
+bool _value_eq(set_t *set, void *val1, void *val2)
 {
-    set->cap = set->cap * 2;
-    set->data = realloc(set->data, set->elsize * set->cap);
+    return (strncmp(val1, val2, set->elsize) == 0);
 }
 
-/**
- * Create a set of elements, having \p element_size size.
- * @param element_size Size of element
-*/
 set_t * set_create_by_size(size_t element_size)
 {
     set_t *set = malloc(sizeof(set_t));
-    set->data = malloc(element_size);
+    for (size_t i = 0; i < HASH_VALUE_COUNT; i++) {
+        set->table[i] = list_create_by_size(element_size);
+    }
     set->elsize = element_size;
-    set->cap = 1;
-    set->size = 0;
     return set;
 }
 
-/**
- * Free resources, used by the set.
- */
 void set_kill(set_t *set)
 {
-    assert(set && set->data);
-    free(set->data);
+    for (size_t i = 0; i < HASH_VALUE_COUNT; i++) {
+        list_kill(set->table[i]);
+    }
     free(set);
 }
 
-/**
- * Get number of elements in the set
- */
-size_t set_size(set_t *set)
+void set_insert(set_t *set, void *value)
 {
-    return set->size;
-}
-
-/**
- * Add an element to the set
- */
-void set_add(set_t *set, void *data)
-{
-    if (set->size == set->cap) {
-        _extend(set);
+    hash_t hash = _hash(set, value);
+    list_iter_t it = list_find(set->table[hash], value);
+    if (list_done(&it)) {
+        list_insert(&it, value);
     }
-
-    void *dst = _addr(set, set->size);
-    memcpy(dst, data, set->elsize);
-    set->size++;
 }
 
-set_iter_t set_begin(set_t *set)
+void set_rm(set_t *set, void *value)
 {
-    set_iter_t it = { .idx = 0 };
+    hash_t hash = _hash(set, value);
+    list_iter_t it = list_find(set->table[hash], value);
+    if (!list_done(&it)) {
+        list_rm(&it);
+    }
+}
+
+set_iter_t set_first(set_t *set)
+{
+    set_iter_t it;
+    it.set = set;
+
+    hash_t hash = 0;
+    while (hash < HASH_VALUE_MAX && list_empty(set->table[hash])) {
+        hash++;
+    }
+    it.hash = hash;
+
+    it.it = list_first(set->table[hash]);
+    
     return it;
 }
 
-bool set_end(set_t *set, set_iter_t iter)
+bool set_done(set_iter_t *it)
 {
-    return (iter.idx >= set->size);
+    return (list_done(&it->it));
 }
 
-set_iter_t set_next(set_t *set, set_iter_t iter)
+void set_next(set_iter_t *it)
 {
-    set_iter_t next = iter;
-    if (next.idx < set->size) {
-        next.idx++;
-    }
-    return next;
-}
-
-/**
- * Get element of set
- */
-void set_get(set_t *set, set_iter_t iter, void *dst)
-{
-    if (!set_end(set, iter)) {
-        memcpy(dst, _addr(set, iter.idx), set->elsize);
+    list_next(&it->it);
+    if (list_done(&it->it)) {
+        hash_t hash = it->hash;
+        if (hash < HASH_VALUE_MAX) {
+            hash++;
+        }
+        while (hash < HASH_VALUE_MAX && list_empty(it->set->table[hash])) {
+            hash++;
+        }
+        it->hash = hash;
+        it->it = list_first(it->set->table[hash]);
     }
 }
 
-/**
- * Get pointer to element
- */
-void * set_pget(set_t *set, set_iter_t iter)
+void * set_pget(set_iter_t *it)
 {
-    if (set_end(set, iter)) {
-        return NULL;
-    }
-    return _addr(set, iter.idx);
+    return list_pget(&it->it);
 }
 
-/**
- * Remove element from set
- */
-void set_rm(set_t *set, set_iter_t iter)
+void set_get(set_iter_t *it, void *dst)
 {
-    assert(!set_end(set, iter));
-
-    if (iter.idx < set->size - 1) {
-        memcpy(_addr(set, iter.idx), _addr(set, set->size-1), set->elsize);
-    }
-    set->size--;
-}
-
-/**
- * Remove all emements from \p set
- */
-void set_clear(set_t *set)
-{
-    set->size = 0;
+    list_get(&it->it, dst);
 }

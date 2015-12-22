@@ -156,11 +156,9 @@
   <ItemGroup>
     <ClCompile Include="main.c" />
     <ClCompile Include="test.c" />
-    <ClCompile Include="test_set.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="test.h" />
-    <ClInclude Include="test_set.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

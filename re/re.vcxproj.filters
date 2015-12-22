@@ -27,19 +27,16 @@
     <ClCompile Include="src\nfa.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\set.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\stack.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\map.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\oset.c">
+    <ClCompile Include="src\list.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\list.c">
+    <ClCompile Include="src\set.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,9 +50,6 @@
     <ClInclude Include="include\nfa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\set.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\stack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -63,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\list.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\set.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

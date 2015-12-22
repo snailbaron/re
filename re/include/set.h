@@ -1,6 +1,7 @@
 /**
- * @file
- * @brief Brief description of set.h
+ @file
+
+ Set functionality
 */
 
 #ifndef _SET_H_
@@ -8,55 +9,43 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include "list.h"
 
 typedef struct set_t set_t;
 
-/// Create a new set, providing element size
 set_t * set_create_by_size(size_t element_size);
 
-/*!
-  \def set_create(TYPE)
-  Create a set holding elements of type TYPE
-*/
 #define set_create(TYPE) set_create_by_size(sizeof(TYPE))
 
-/// Free existing set
 void set_kill(set_t *set);
 
-/// Add an element to set by its address
-void set_add(set_t *set, void *data);
+void set_insert(set_t *set, void *value);
 
-/// Get number of elements in set
-size_t set_size(set_t *set);
-
-// Remove all elements from set
-void set_clear(set_t *set);
+void set_rm(set_t *set, void *value);
 
 
-/* Iterators */
 
-/// Iterator structure
-typedef struct
+typedef uint8_t hash_t;
+
+typedef struct set_iter_t set_iter_t;
+
+struct set_iter_t
 {
-    size_t idx;
-} set_iter_t;
+    set_t *set;
+    hash_t hash;
+    list_iter_t it;
+};
 
-/// Begin iterating a set
-set_iter_t set_begin(set_t *set);
+set_iter_t set_first(set_t *set);
 
-/// Check if finished iterating a set
-bool set_end(set_t *set, set_iter_t iter);
+bool set_done(set_iter_t *it);
 
-/// Get next element of a set
-set_iter_t set_next(set_t *set, set_iter_t iter);
+void set_next(set_iter_t *it);
 
-/// Copy value of current element to a location
-void set_get(set_t *set, set_iter_t iter, void *dst);
+void * set_pget(set_iter_t *it);
 
-/// Get pointer to current element
-void * set_pget(set_t *set, set_iter_t iter);
+void set_get(set_iter_t *it, void *dst);
 
-/// Remove element from set
-void set_rm(set_t *set, set_iter_t iter);
 
 #endif

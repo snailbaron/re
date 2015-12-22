@@ -1,30 +1,34 @@
-#include <set.h>
 #include <stdio.h>
 
-#include <list.h>
+#include <set.h>
 
 int main()
 {
-    list_t *list = list_create(int);
+    set_t *set = set_create(int);
 
-    list_iter_t *it = list_start_iter(list);
-    for (int i = 0; i < 10; i++) {
-        list_add(it, &i);
-        list_next(it);
-    }
-    list_end_iter(it);
+    int val = 10;
+    int val2 = 25;
+    set_insert(set, &val);
+    set_insert(set, &val);
+    set_insert(set, &val2);
+    set_insert(set, &val);
+    set_insert(set, &val2);
 
-
-    for (list_iter_t *it = list_start_iter(list); !list_end(it); list_next(it)) {
+    for (set_iter_t it = set_first(set); !set_done(&it); set_next(&it)) {
         int value;
-        list_get(it, &value);
+        set_get(&it, &value);
+        printf("Value: %d\n", value);        
+    }
+
+    printf("Removing\n");
+    set_rm(set, &val2);
+
+    for (set_iter_t it = set_first(set); !set_done(&it); set_next(&it)) {
+        int value;
+        set_get(&it, &value);
         printf("Value: %d\n", value);
     }
-    list_end_iter(it);
-    
-        
 
-        
 
-    
+    set_kill(set);
 }
